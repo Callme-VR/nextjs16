@@ -22,8 +22,15 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useTransition } from "react";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function CreateRoutePage() {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const mutation = useMutation(api.posts.CreatePost);
 
   const form = useForm({
@@ -35,9 +42,13 @@ export default function CreateRoutePage() {
   });
 
   function onSubmit(values: z.infer<typeof POST_SCHEMA>) {
-    mutation({
-      body: values.content,
-      title: values.title,
+    startTransition(async () => {
+      mutation({
+        body: values.content,
+        title: values.title,
+      });
+      toast.success("created post successfully!");
+      router.push("/");
     });
   }
 
@@ -100,8 +111,15 @@ export default function CreateRoutePage() {
                 )}
               />
             </FieldGroup>
-            <Button type="submit" className="mt-4 w-full">
-              Create Post
+            <Button type="submit" className="mt-4 w-full" disabled={isPending}>
+              {isPending ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  <span>Creating...</span>
+                </>
+              ) : (
+                <span>create post</span>
+              )}
             </Button>
           </form>
         </CardContent>
