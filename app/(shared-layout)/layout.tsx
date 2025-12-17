@@ -1,10 +1,11 @@
 import Navbar from "@/components/web/navbar";
 import { ReactNode } from "react";
 
-export default function SharedLayoutPage({chiddren}:{chiddren:ReactNode}){
+export default function SharedLayoutPage({children}:{children:ReactNode}){
     return(
-        <><Navbar/>
-        {chiddren}
-        </>
+        <div suppressHydrationWarning={true}>
+                <Navbar/>
+                {children}
+        </div>
     )
-}
+}   
