@@ -26,6 +26,7 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { createBlogAction } from "@/app/action";
 
 export default function CreateRoutePage() {
   const router = useRouter();
@@ -43,10 +44,13 @@ export default function CreateRoutePage() {
 
   function onSubmit(values: z.infer<typeof POST_SCHEMA>) {
     startTransition(async () => {
-      mutation({
-        body: values.content,
-        title: values.title,
-      });
+      // mutation({
+      //   body: values.content,
+      //   title: values.title,
+      // }); 
+      // server side action call
+      await createBlogAction(values)
+
       toast.success("created post successfully!");
       router.push("/");
     });
@@ -66,8 +70,10 @@ export default function CreateRoutePage() {
 
       <Card className="w-full max-5-xl mx-auto">
         <CardHeader>
-          <CardTitle>Get Started</CardTitle>
-          <CardDescription>Start creating your blog today</CardDescription>
+          <CardTitle className="text-center">Get Started</CardTitle>
+          <CardDescription className="text-center">
+            Start creating your blog today
+          </CardDescription>
         </CardHeader>
         {/* for the card components */}
 
@@ -111,7 +117,7 @@ export default function CreateRoutePage() {
                 )}
               />
             </FieldGroup>
-            <Button type="submit" className="mt-4 w-full" disabled={isPending}>
+            <Button type="submit" className="mt-4 w-full cursor-pointer" disabled={isPending}>
               {isPending ? (
                 <>
                   <Loader2 className="animate-spin" />
