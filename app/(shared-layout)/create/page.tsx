@@ -107,7 +107,6 @@ export default function CreateRoutePage() {
         </CardHeader>
         {/* for the card components */}
 
-
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>

@@ -3,6 +3,7 @@ import { POST_SCHEMA } from "./schema/blog";
 import { redirect } from "next/navigation";
 import { fetchMutation } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
+import { revalidatePath } from "next/cache";
 
 export async function createBlogAction(values: z.infer<typeof POST_SCHEMA>) {
   const parsed = POST_SCHEMA.safeParse(values);
@@ -32,6 +33,7 @@ export async function createBlogAction(values: z.infer<typeof POST_SCHEMA>) {
     error:"Fialed to create post"
 
   }
+  revalidatePath("/blog")
 
   // This action now only handles validation and redirect
   // The actual mutation will be handled client-side

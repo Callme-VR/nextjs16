@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 import { Metadata } from "next";
+import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -43,6 +44,8 @@ export default function BlogPage() {
 
 // streaming feature is implemented here 
 // this is the server code which is run after 
+// and cache working in this page with proper exlantion
+
 async function LoadingBlogList() {
   // "use cache";
   // cacheLife("hours");
