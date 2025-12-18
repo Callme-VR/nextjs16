@@ -39,20 +39,26 @@ export default function CreateRoutePage() {
     defaultValues: {
       title: "",
       content: "",
+      image: undefined,
     },
   });
 
   function onSubmit(values: z.infer<typeof POST_SCHEMA>) {
     startTransition(async () => {
-      // mutation({
-      //   body: values.content,
-      //   title: values.title,
-      // }); 
-      // server side action call
-      await createBlogAction(values)
+      try {
+        // Handle the mutation client-side
+        await mutation({
+          body: values.content,
+          title: values.title,
+          imageStorageId: values.stroageId,
+        });
 
-      toast.success("created post successfully!");
-      router.push("/");
+        toast.success("created post successfully!");
+        router.push("/");
+      } catch (error) {
+        toast.error("Failed to create post");
+        console.error("Error creating post:", error);
+      }
     });
   }
 
@@ -116,8 +122,36 @@ export default function CreateRoutePage() {
                   </Field>
                 )}
               />
+
+              <Controller
+                name="image"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Image</FieldLabel>
+                    <Input
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Super cool blog content"
+                      type="file"
+                      accept="image/*"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        field.onChange(file);
+                      }}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
             </FieldGroup>
-            <Button type="submit" className="mt-4 w-full cursor-pointer" disabled={isPending}>
+
+            <Button
+              type="submit"
+              className="mt-4 w-full cursor-pointer"
+              disabled={isPending}
+            >
               {isPending ? (
                 <>
                   <Loader2 className="animate-spin" />

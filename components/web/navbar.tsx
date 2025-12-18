@@ -26,8 +26,8 @@ export default function Navbar() {
           <Link className={buttonVariants({ variant: "ghost" })} href={"/"}>
             Home
           </Link>
-          <Link className={buttonVariants({ variant: "ghost" })} href={"/Blog"}>
-            Blog
+          <Link className={buttonVariants({ variant: "ghost" })} href={"/blog"}>
+            blog
           </Link>
           <Link
             className={buttonVariants({ variant: "ghost" })}

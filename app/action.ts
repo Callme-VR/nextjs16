@@ -1,9 +1,8 @@
 import z from "zod";
 import { POST_SCHEMA } from "./schema/blog";
+import { redirect } from "next/navigation";
 import { fetchMutation } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
-import { redirect } from "next/navigation";
-import { gettoken } from "@/lib/auth-server";
 
 export async function createBlogAction(values: z.infer<typeof POST_SCHEMA>) {
   const parsed = POST_SCHEMA.safeParse(values);
@@ -12,17 +11,29 @@ export async function createBlogAction(values: z.infer<typeof POST_SCHEMA>) {
     throw new Error("Invalid input");
   }
 
-  const token =  await gettoken();
+  try {
+    const imageUrl = await fetchMutation(
+      api.posts.generateImageUploadUrl, {},
+    )
 
-  await fetchMutation(
-    api.posts.CreatePost,
-    {
-      body: parsed.data.content,
-      title: parsed.data.title,
-    },
-    {
-      token,
+    const uploadResult = await fetch(imageUrl, {
+      method: "POST",
+      headers: {
+        "Content-type": parsed.data.image?.type
+      },
+      body: parsed.data.image
+    })
+    if (!uploadResult.ok) {
+      error: "Failed to upload image"
     }
-  );
-  return redirect("/");
+    const { storageId } = await uploadResult.json()
+
+  } catch (error) {
+    error:"Fialed to create post"
+
+  }
+
+  // This action now only handles validation and redirect
+  // The actual mutation will be handled client-side
+  return redirect("/blog");
 }
