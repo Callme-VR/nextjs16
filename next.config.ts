@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
           hostname:"images.unsplash.com",
           protocol: "https",
           port:""
+        },{
+          hostname:"greedy-panther-393.convex.cloud",
+          protocol: "https",
+          port:""
         }
       ]
     }

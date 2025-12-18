@@ -26,13 +26,15 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { createBlogAction } from "@/app/action";
+// import { createBlogAction } from "@/app/action";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function CreateRoutePage() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const mutation = useMutation(api.posts.CreatePost);
+  const generateUploadUrl = useMutation(api.posts.generateImageUploadUrl);
 
   const form = useForm({
     resolver: zodResolver(POST_SCHEMA),
@@ -46,11 +48,33 @@ export default function CreateRoutePage() {
   function onSubmit(values: z.infer<typeof POST_SCHEMA>) {
     startTransition(async () => {
       try {
+        let imageStorageId: Id<"_storage"> | undefined;
+        
+        // Handle image upload if present
+        if (values.image) {
+          const uploadUrl = await generateUploadUrl();
+          
+          const uploadResult = await fetch(uploadUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": values.image.type,
+            },
+            body: values.image,
+          });
+          
+          if (!uploadResult.ok) {
+            throw new Error("Failed to upload image");
+          }
+          
+          const { storageId } = await uploadResult.json();
+          imageStorageId = storageId;
+        }
+
         // Handle the mutation client-side
         await mutation({
           body: values.content,
           title: values.title,
-          imageStorageId: values.stroageId,
+          imageStorageId: imageStorageId,
         });
 
         toast.success("created post successfully!");
@@ -82,6 +106,7 @@ export default function CreateRoutePage() {
           </CardDescription>
         </CardHeader>
         {/* for the card components */}
+
 
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)}>
