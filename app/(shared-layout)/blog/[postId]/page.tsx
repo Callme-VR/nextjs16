@@ -7,6 +7,7 @@ import type { Id } from "@/convex/_generated/dataModel";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import CommentSection from "@/components/web/CommentSection";
+import { metadata } from "@/app/layout";
 
 interface PostIdRouteProps {
   params: Promise<{
@@ -14,7 +15,30 @@ interface PostIdRouteProps {
   }>;
 }
 
-export default async function POstIdPage({ params }: PostIdRouteProps) {
+
+// dynamic metadata and better for seo and some how  for  dynamic routing
+
+export async function generateMetadata({ params }: PostIdRouteProps) {
+  const { postId } = await params
+  const post = await fetchQuery(api.posts.getPostById, { postId: postId })
+
+  if (!post) {
+    return {
+      title: "Post Not Found"
+    };
+  }
+  return {
+    title: post.title,
+    description: post.body,
+  }
+
+}
+
+
+
+
+
+export default async function PostIdPage({ params }: PostIdRouteProps) {
   const { postId } = await params;
 
   const post = await fetchQuery(api.posts.getPostById, { postId: postId });
