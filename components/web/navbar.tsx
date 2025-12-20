@@ -41,7 +41,7 @@ export default function Navbar() {
       {/* for login and register button */}
 
       <div className="flex items-center gap-2">
-        <div className="relative sm:hidden">
+        <div className="relative">
           <SearchInput />
         </div>
         {isLoading ? null : isAuthenticated ? (

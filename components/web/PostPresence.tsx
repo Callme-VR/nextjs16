@@ -8,11 +8,11 @@ import Facepile from "./Facepile";
 
 interface iAppProps {
     roomId: Id<"posts">,
-    userId: string | any
+    userId: string
 }
 
 export default function PostPresence({ roomId, userId }: iAppProps) {
-    const presenceState = usePresence(api.presence, "my-chat", roomId, userId)
+    const presenceState = usePresence(api.presence, roomId, userId)
 
     if (!presenceState || presenceState.length === 0) {
         return null;

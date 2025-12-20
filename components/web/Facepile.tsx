@@ -1,22 +1,32 @@
 "use client";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useState } from "react";
+
+interface PresenceData {
+  image?: string;
+  name?: string;
+}
+
+interface Presence {
+  data?: PresenceData;
+  created?: number;
+  [key: string]: unknown;
+}
 
 interface FacepileProps {
-  presenceState: any[];
+  presenceState: Presence[];
 }
 
 export default function Facepile({ presenceState }: FacepileProps) {
+  const [isMounted] = useState(true);
+
   return (
     <div className="flex -space-x-3 rtl:space-x-reverse">
       <TooltipProvider>
@@ -24,21 +34,21 @@ export default function Facepile({ presenceState }: FacepileProps) {
           // Flatten structure if needed or handle various shapes
           // presence might be just data, or { data, ... } depending on the library version
           const data = presence?.data ?? presence;
-          
-           const isUserObject = typeof data === 'object' && data !== null;
-           const image = isUserObject ? data.image : undefined;
-           const name = isUserObject ? data.name : "User " + (index + 1);
-           
-           // If data is just a string (userId), we can't show much without fetching.
-           // Maybe we show a generic avatar.
-           
+
+          const isUserObject = typeof data === "object" && data !== null;
+          const image = isUserObject ? data.image : undefined;
+          const name = isUserObject ? data.name : "User " + (index + 1);
+
+          // If data is just a string (userId), we can't show much without fetching.
+          // Maybe we show a generic avatar.
+
           return (
             <Tooltip key={(presence?.created ?? index) + "-" + index}>
               <TooltipTrigger asChild>
                 <Avatar className="h-8 w-8 border-2 border-background cursor-pointer hover:z-10 transition-transform hover:scale-110">
-                  <AvatarImage src={image} />
+                  <AvatarImage src={image} alt="User avatar" />
                   <AvatarFallback className="text-[10px]">
-                    {name.slice(0, 2).toUpperCase()}
+                    {name ? name.slice(0, 2).toUpperCase() : ""}
                   </AvatarFallback>
                 </Avatar>
               </TooltipTrigger>
