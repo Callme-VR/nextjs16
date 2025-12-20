@@ -3,13 +3,23 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
-import { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import cache from "next/cache";
-import { connection } from "next/server";
+import { Metadata } from "next";
+import { Doc } from "@/convex/_generated/dataModel";
+
+// Export metadata for SEO
+export const metadata: Metadata = {
+  title: "Our Blog - Insights, Thoughts, and Trends",
+  description: "Discover insights, thoughts, and trends from our team. Read our latest blog posts on technology, development, and innovation.",
+  openGraph: {
+    title: "Our Blog - Insights, Thoughts, and Trends",
+    description: "Discover insights, thoughts, and trends from our team. Read our latest blog posts on technology, development, and innovation.",
+    type: "website",
+  },
+};
 
 // static content in this function
 export default function BlogPage() {
@@ -33,37 +43,41 @@ export default function BlogPage() {
 
 // streaming feature is implemented here
 // this is the server code which is run after
-// and cache working in this page with proper exlantion
+// and cache working in this page with proper explanation
 
-async function LoadingBlogList() {
-  // "use cache";
-  // cacheLife("hours");
-  // cacheTag("blog");
-  const data = await fetchQuery(api.posts.getposts);
+// Define fallback URL for blog post images
+const fallbackUrl = "https://images.unsplash.com/photo-1761019646782-4bc46ba43fe9?q=80&w=1631&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
+// Component to render blog posts grid
+function BlogPostsGrid({ posts }: { posts: (Doc<"posts"> & { imageUrl?: string | null })[] }) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {data?.map((post) => (
+      {posts.map((post) => (
         <Card key={post._id} className="pt-0">
           <div className="relative h-48 w-full overflow-hidden">
             <Image
-              src={
-                post.imageUrl ??
-                "https://images.unsplash.com/photo-1761019646782-4bc46ba43fe9?q=80&w=1631&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              }
-              alt="image"
+              src={post.imageUrl || fallbackUrl}
+              alt={post.title || "Blog post image"}
               fill
               className="rounded-t-lg object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              onError={(e) => {
+                // Handle image loading errors
+                const target = e.target as HTMLImageElement;
+                target.src = fallbackUrl;
+              }}
             />
           </div>
 
           <CardContent>
             <Link href={`/blog/${post._id}`}>
-              <h1 className="text-2xl font-bold hover:text-primary">
-                {post.title}
+              <h1 className="text-2xl font-bold hover:text-primary transition-colors">
+                {post.title || "Untitled Post"}
               </h1>
             </Link>
-            <p className="text-muted-foreground line-clamp-3">{post.body}</p>
+            <p className="text-muted-foreground line-clamp-3 mt-2">
+              {post.body || "No content available."}
+            </p>
           </CardContent>
           <CardFooter>
             <Link
@@ -79,6 +93,57 @@ async function LoadingBlogList() {
       ))}
     </div>
   );
+}
+
+// Component to show when no posts are available
+function NoPosts() {
+  return (
+    <div className="text-center py-12">
+      <p className="text-muted-foreground text-lg">No blog posts available yet.</p>
+    </div>
+  );
+}
+
+// Component to show error state
+function ErrorState() {
+  return (
+    <div className="text-center py-12">
+      <p className="text-destructive text-lg">Failed to load blog posts. Please try again later.</p>
+    </div>
+  );
+}
+
+// Component that handles data fetching and state management
+async function BlogListContent() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("blog");
+  
+  const data = await fetchQuery(api.posts.getposts);
+  return data;
+}
+
+// Wrapper component that handles error states
+async function LoadingBlogList() {
+  let posts: Awaited<ReturnType<typeof BlogListContent>> | null = null;
+  let hasError = false;
+
+  try {
+    posts = await BlogListContent();
+  } catch (error) {
+    console.error("Error fetching blog posts:", error);
+    hasError = true;
+  }
+
+  if (hasError) {
+    return <ErrorState />;
+  }
+
+  if (!posts || posts.length === 0) {
+    return <NoPosts />;
+  }
+
+  return <BlogPostsGrid posts={posts} />;
 }
 
 function SkeletonLoadingUi() {
