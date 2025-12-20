@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import CommentSection from "@/components/web/CommentSection";
 import { metadata } from "@/app/layout";
 import PostPresence from "@/components/web/PostPresence";
+import { getToken } from "@/lib/auth-server";
 
 interface PostIdRouteProps {
   params: Promise<{
@@ -39,8 +40,10 @@ export async function generateMetadata({ params }: PostIdRouteProps) {
 
 
 export default async function PostIdPage({ params }: PostIdRouteProps) {
+    const token=await getToken();
+
   const { postId } = await params;
-  await fetchQuery(api.presence.getuserId, {});
+  const userId = await fetchQuery(api.presence.getuserId, {},{token});
 
 
   const post = await fetchQuery(api.posts.getPostById, { postId: postId });
