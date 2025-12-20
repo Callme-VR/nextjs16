@@ -36,7 +36,6 @@ export default function BlogPage() {
 // and cache working in this page with proper exlantion
 
 async function LoadingBlogList() {
-  await connection()
   // "use cache";
   // cacheLife("hours");
   // cacheTag("blog");
