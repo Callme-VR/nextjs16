@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
           protocol: "https",
           port:""
         },{
-          hostname:"greedy-panther-393.convex.cloud",
+          hostname:"spotted-hyena-673.convex.cloud",
           protocol: "https",
           port:""
         }
