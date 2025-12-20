@@ -7,20 +7,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { PresenceState } from "@convex-dev/presence/react";
 
 interface PresenceData {
   image?: string;
   name?: string;
 }
 
-interface Presence {
-  data?: PresenceData;
-  created?: number;
-  [key: string]: unknown;
-}
-
 interface FacepileProps {
-  presenceState: Presence[];
+  presenceState: PresenceState[];
 }
 
 export default function Facepile({ presenceState }: FacepileProps) {
@@ -39,7 +34,7 @@ export default function Facepile({ presenceState }: FacepileProps) {
           // Maybe we show a generic avatar.
 
           return (
-            <Tooltip key={(presence?.created ?? index) + "-" + index}>
+            <Tooltip key={index}>
               <TooltipTrigger asChild>
                 <Avatar className="h-8 w-8 border-2 border-background cursor-pointer hover:z-10 transition-transform hover:scale-110">
                   <AvatarImage src={image} alt="User avatar" />
