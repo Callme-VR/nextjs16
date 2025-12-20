@@ -15,7 +15,7 @@ export const authComponent = createClient<DataModel>(components.betterAuth);
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
     return betterAuth({
         baseURL: siteUrl,
-        trustedOrigins: ["http://localhost:3000"],
+        trustedOrigins: ["https://blogger-xi-rose.vercel.app"],
         database: authComponent.adapter(ctx),
         // Configure simple, non-verified email/password to get started
         emailAndPassword: {
