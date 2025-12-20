@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import cache from "next/cache";
+import { connection } from "next/server";
 
 // static content in this function
 export default function BlogPage() {
@@ -35,6 +36,7 @@ export default function BlogPage() {
 // and cache working in this page with proper exlantion
 
 async function LoadingBlogList() {
+  await connection()
   // "use cache";
   // cacheLife("hours");
   // cacheTag("blog");
