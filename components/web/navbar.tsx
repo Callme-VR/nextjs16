@@ -6,12 +6,12 @@ import { useConvexAuth } from "convex/react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import SearchInput from "./SearchInput";
 
 export default function Navbar() {
   const { isAuthenticated, isLoading } = useConvexAuth();
 
-
-  const router=useRouter();
+  const router = useRouter();
   return (
     <nav className="w-full py-5 flex items-center justify-between">
       <div className="flex items-center gap-8 ">
@@ -41,18 +41,27 @@ export default function Navbar() {
       {/* for login and register button */}
 
       <div className="flex items-center gap-2">
+        <div className="relative sm:hidden">
+          <SearchInput />
+        </div>
         {isLoading ? null : isAuthenticated ? (
-          <Button onClick={()=>authClient.signOut({
-            fetchOptions:{
-                onSuccess:()=>{
-                    toast.success("Logged out successFully")
-                    router.push("/")
+          <Button
+            onClick={() =>
+              authClient.signOut({
+                fetchOptions: {
+                  onSuccess: () => {
+                    toast.success("Logged out successFully");
+                    router.push("/");
+                  },
+                  onError: () => {
+                    toast.error("Failed to log out");
+                  },
                 },
-                onError:()=>{
-                    toast.error("Failed to log out")
-                }
+              })
             }
-          })}>Logout</Button>
+          >
+            Logout
+          </Button>
         ) : (
           <>
             {" "}

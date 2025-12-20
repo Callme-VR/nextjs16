@@ -10,6 +10,7 @@ import CommentSection from "@/components/web/CommentSection";
 import { metadata } from "@/app/layout";
 import PostPresence from "@/components/web/PostPresence";
 import { getToken } from "@/lib/auth-server";
+import { redirect } from "next/navigation";
 
 interface PostIdRouteProps {
   params: Promise<{
@@ -17,36 +18,34 @@ interface PostIdRouteProps {
   }>;
 }
 
-
-
-
 // dynamic metadata and better for seo and some how  for  dynamic routing
 export async function generateMetadata({ params }: PostIdRouteProps) {
-  const { postId } = await params
-  const post = await fetchQuery(api.posts.getPostById, { postId: postId })
+  const { postId } = await params;
+  const post = await fetchQuery(api.posts.getPostById, { postId: postId });
 
   if (!post) {
     return {
-      title: "Post Not Found"
+      title: "Post Not Found",
     };
   }
   return {
     title: post.title,
     description: post.body,
-  }
+  };
 }
 
-
-
-
 export default async function PostIdPage({ params }: PostIdRouteProps) {
-    const token=await getToken();
+  const token = await getToken();
 
   const { postId } = await params;
-  const userId = await fetchQuery(api.presence.getuserId, {},{token});
-
+  const userId = await fetchQuery(api.presence.getuserId, {}, { token });
 
   const post = await fetchQuery(api.posts.getPostById, { postId: postId });
+
+  if (!userId) {
+    return redirect("/login");
+  }
+
   if (!post) {
     return (
       <div>
@@ -55,10 +54,6 @@ export default async function PostIdPage({ params }: PostIdRouteProps) {
     );
   }
 
-
-
-
-  
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 animate-in fade-in duration-500 relative">
       <Link
@@ -86,21 +81,14 @@ export default async function PostIdPage({ params }: PostIdRouteProps) {
           {post.title}
         </h1>
 
-
-
         <p className="tracking-tighter font-semibold text-muted-foreground">
           Posted on:
           {new Date(post._creationTime).toLocaleDateString("en-IN")}
         </p>
 
-        {userId && <PostPresence roomId={post._id} userId={userId} />
-        }
-
-
+        {userId && <PostPresence roomId={post._id} userId={userId} />}
 
         <Separator className="my-9" />
-
-
 
         <div className="prose prose-gray dark:prose-invert max-w-none">
           <div className="whitespace-pre-wrap">{post.body}</div>

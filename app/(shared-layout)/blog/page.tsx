@@ -1,4 +1,3 @@
-
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,8 +8,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-
-
+import cache from "next/cache";
 
 // static content in this function
 export default function BlogPage() {
@@ -32,12 +30,8 @@ export default function BlogPage() {
   );
 }
 
-
-
-
-
-// streaming feature is implemented here 
-// this is the server code which is run after 
+// streaming feature is implemented here
+// this is the server code which is run after
 // and cache working in this page with proper exlantion
 
 async function LoadingBlogList() {
