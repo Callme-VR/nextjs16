@@ -98,7 +98,7 @@ export default function CreateRoutePage() {
         </p>
       </div>
 
-      <Card className="w-full max-5-xl mx-auto">
+      <Card className="max-w-6xl mx-auto">
         <CardHeader>
           <CardTitle className="text-center">Get Started</CardTitle>
           <CardDescription className="text-center">
